@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 // Conexão com o MongoDB Atlas - URI diretamente no código
-const client = new MongoClient('mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users');
+const client = new MongoClient('"mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users');
 let produtosCollection;
 
 async function conectar() {
