@@ -16,8 +16,8 @@ let userCollection;
 async function conectar() {
   try {
     await client.connect();
-    const db = client.db('users'); // Banco de dados: users
-    userCollection = db.collection('user'); // Coleção: user
+    const db = client.db('user'); // Banco de dados: users
+    userCollection = db.collection('users'); // Coleção: user
     console.log('✅ Conectado ao MongoDB com driver nativo');
   } catch (err) {
     console.error('❌ Erro ao conectar ao MongoDB:', err);
