@@ -3,13 +3,18 @@ require('express');
 
 // Criar uma constante do Express
 const express = require('express');
+const { engine } = require('express-handlebars');
 
 // Importar MongoDB e adicionar em uma constante
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 // Criar app
 const app = express();
+
+app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 app.use(express.json());
+app.engine('handlebars', engine());
+app.set('view', './views');
 
 app.use(cors());
 // Conexão com o MongoDB Atlas - URI diretamente no código
