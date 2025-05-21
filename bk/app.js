@@ -12,9 +12,18 @@ const cors = require('cors');
 const app = express();
 
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
+
+
+// Esta linha está faltando
+app.set('views', './views'); // Nome da pasta corrigido (plural)
+
+
+
+
+
 app.use(express.json());
 app.engine('handlebars', engine());
-app.set('view', './views');
+
 
 app.use(cors());
 // Conexão com o MongoDB Atlas - URI diretamente no código
@@ -48,7 +57,7 @@ res.status(500).json({ erro: 'Erro ao salvar produto', detalhes: err.message });
 
 // Rota para listar todos os produtos
 app.get('/', async (req, res) => {
-  // res.render('formulario');
+  
   try {
     const produtos = await produtosCollection.find().toArray();
     res.json(produtos);
@@ -56,7 +65,15 @@ app.get('/', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao buscar produtos' });
   }
 });
-
+// Rota para exibir página com listagem de produtos via Handlebars
+app.get('/produtos', async (req, res) => {
+  try {
+    const produtos = await produtosCollection.find().toArray();
+    res.render('home', { produtos }); // home.handlebars dentro de ./views
+  } catch (err) {
+    res.status(500).send('Erro ao carregar produtos');
+  }
+});
 // Iniciar o servidor na porta 3000
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
