@@ -50,7 +50,7 @@ res.status(500).json({ erro: 'Erro ao salvar produto', detalhes: err.message });
 app.get('/', async (req, res) => {
   try {
     const produtos = await produtosCollection.find().toArray();
-    res.json(produtos);
+    res.render('formulario', {produtos});
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao buscar produtos' });
   }
