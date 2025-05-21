@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Listagem de Produtos</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background-color: #f9f9f9; }
+    .produto { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; background: white; }
+  </style>
+</head>
+<body>
+
+  <h1>Produtos</h1>
+
+  {{#if produtos}}
+    <ul>
+      {{#each produtos}}
+        <li class="produto">
+          <strong>{{this.nome}}</strong><br>
+          Preço: R$ {{this.preco}}
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>Nenhum produto encontrado.</p>
+  {{/if}}
+
+</body>
+</html>
