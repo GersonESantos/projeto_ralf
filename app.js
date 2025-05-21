@@ -3,20 +3,15 @@ require('express');
 
 // Criar uma constante do Express
 const express = require('express');
-const { engine } = require('express-handlebars');
 
 // Importar MongoDB e adicionar em uma constante
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 // Criar app
 const app = express();
-
-app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 app.use(express.json());
-app.engine('handlebars', engine());
-app.set('view', './views');
 
-app.use(cors());
+app.use(cors()); // Isso permite qualquer origem
 // Conexão com o MongoDB Atlas - URI diretamente no código
 const client = new MongoClient('mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users');
 let produtosCollection;
@@ -48,7 +43,6 @@ res.status(500).json({ erro: 'Erro ao salvar produto', detalhes: err.message });
 
 // Rota para listar todos os produtos
 app.get('/', async (req, res) => {
-  // res.render('formulario');
   try {
     const produtos = await produtosCollection.find().toArray();
     res.json(produtos);
