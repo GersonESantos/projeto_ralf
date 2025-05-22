@@ -6,14 +6,13 @@ const express = require('express');
 
 // Importar MongoDB e adicionar em uma constante
 const { MongoClient } = require('mongodb');
-const cors = require('cors');
+
 // Criar app
 const app = express();
 app.use(express.json());
 
-app.use(cors()); // Isso permite qualquer origem
 // Conexão com o MongoDB Atlas - URI diretamente no código
-const client = new MongoClient('mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users');
+const client = new MongoClient('mongodb+srv://ralf:123@cluster0.a0ntihz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 let produtosCollection;
 
 async function conectar() {
