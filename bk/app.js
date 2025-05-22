@@ -1,33 +1,53 @@
-// Importar Express
-require('express');
-
-// Criar uma constante do Express
 const express = require('express');
 const { engine } = require('express-handlebars');
-
-// Importar MongoDB e adicionar em uma constante
 const { MongoClient } = require('mongodb');
-const cors = require('cors');
-// Criar app
+const multer = require('multer');
+const path = require('path');
+
 const app = express();
-
-app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
-
-
-// Esta linha está faltando
-app.set('views', './views'); // Nome da pasta corrigido (plural)
+const hbs = require('express-handlebars');
 
 
 
 
 
+/// Config Handlebars com helper de formatação de preço
+const handlebars = hbs.create({
+  helpers: {
+    formatarPreco(valor) {
+      return (valor / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+  }
+});
+
+app.engine('handlebars', handlebars.engine); // ✅ Usando a instância correta
+app.set('view engine', 'handlebars');
+app.set('views', './views');
+
+// Pasta pública (Bootstrap + uploads)
+app.use(express.static('public'));
+
+// Middleware para formulários e JSON
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.engine('handlebars', engine());
 
+// Upload de imagem - Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage });
 
-app.use(cors());
-// Conexão com o MongoDB Atlas - URI diretamente no código
-const client = new MongoClient('mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users');
+// Conexão MongoDB
+const client = new MongoClient(
+  'mongodb+srv://gebhsantos:A3YG8lXShNUS7FUw@users.vnnwl.mongodb.net/users?retryWrites=true&w=majority&appName=users'
+);
 let produtosCollection;
 
 async function conectar() {
@@ -35,7 +55,7 @@ async function conectar() {
     await client.connect();
     const db = client.db('produtosDB');
     produtosCollection = db.collection('produtos');
-    console.log('Conectado ao MongoDB com driver nativo');
+    console.log('Conectado ao MongoDB');
   } catch (err) {
     console.error('Erro ao conectar ao MongoDB:', err);
   }
@@ -43,39 +63,54 @@ async function conectar() {
 
 conectar();
 
-// Rota para criar um novo produto
-app.post('/', async (req, res) => {
+// Rota principal - Lista produtos e form
+app.get('/', async (req, res) => {
   try {
-    const { nome, preco } = req.body;
-    const resultado = await produtosCollection.insertOne({ nome, preco });
-    res.status(201).json({ id: resultado.insertedId, nome, preco });
+    const produtos = await produtosCollection.find().toArray();
+    res.render('home', { produtos });
   } catch (err) {
-    console.error('Erro ao salvar produto:', err);
-res.status(500).json({ erro: 'Erro ao salvar produto', detalhes: err.message });
+    res.status(500).send('Erro ao carregar página');
   }
 });
 
-// Rota para listar todos os produtos
-app.get('/', async (req, res) => {
-  
+// Rota para cadastrar produto
+app.post('/produtos', upload.single('imagem'), async (req, res) => {
   try {
-    const produtos = await produtosCollection.find().toArray();
-    res.json(produtos);
+    const { nome, preco } = req.body;
+    const precoFormatado = parseInt(preco, 10);
+
+    if (!nome || isNaN(precoFormatado)) {
+      return res.status(400).send('Dados inválidos');
+    }
+
+    const produto = {
+      nome,
+      preco: precoFormatado,
+      imagem: req.file ? `/uploads/${req.file.filename}` : null
+    };
+
+    await produtosCollection.insertOne(produto);
+    res.redirect('/');
   } catch (err) {
-    res.status(500).json({ erro: 'Erro ao buscar produtos' });
+    console.error(err);
+    res.status(500).send('Erro ao salvar produto');
   }
 });
-// Rota para exibir página com listagem de produtos via Handlebars
-app.get('/produtos', async (req, res) => {
+
+// Busca com filtro
+app.get('/buscar', async (req, res) => {
   try {
-    const produtos = await produtosCollection.find().toArray();
-    res.render('home', { produtos }); // home.handlebars dentro de ./views
+    const { q } = req.query;
+    const query = q ? { nome: new RegExp(q, 'i') } : {};
+    const produtos = await produtosCollection.find(query).toArray();
+    res.render('home', { produtos, busca: q });
   } catch (err) {
-    res.status(500).send('Erro ao carregar produtos');
+    res.status(500).send('Erro na busca');
   }
 });
-// Iniciar o servidor na porta 3000
+
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

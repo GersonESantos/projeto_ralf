@@ -9,10 +9,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.6",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-handlebars": "^8.0.2",
-    "mongodb": "^6.16.0"
+    "mongodb": "^6.16.0",
+    "multer": "^2.0.0"
   }
 }

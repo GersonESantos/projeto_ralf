@@ -1,0 +1,22 @@
+<div class="row g-4">
+  {{#each produtos}}
+    <div class="col-md-4 d-flex">
+      <div class="card shadow-sm produto-card w-100">
+        <!-- Imagem -->
+        {{#if this.imagem}}
+          <img src="{{this.imagem}}" alt="{{this.nome}}">
+        {{else}}
+          <div class="bg-light d-flex justify-content-center align-items-center" style="height: 120px;">
+            Sem imagem
+          </div>
+        {{/if}}
+
+        <!-- Conteúdo -->
+        <div class="card-body">
+          <h5 class="card-title">{{this.nome}}</h5>
+          <p class="card-text text-primary fs-6">{{formatarPreco this.preco}}</p>
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</div>

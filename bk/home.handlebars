@@ -43,28 +43,25 @@
 
   <!-- Produtos -->
   {{#if produtos}}
-   <div class="row g-4">
-  {{#each produtos}}
-    <div class="col-md-4 d-flex">
-      <div class="card shadow-sm produto-card w-100">
-        <!-- Imagem -->
-        {{#if this.imagem}}
-          <img src="{{this.imagem}}" alt="{{this.nome}}">
-        {{else}}
-          <div class="bg-light d-flex justify-content-center align-items-center" style="height: 120px;">
-            Sem imagem
+    <div class="row g-4">
+      {{#each produtos}}
+        <div class="col-md-4">
+          <div class="card shadow-sm produto-card h-100">
+            {{#if this.imagem}}
+              <img src="{{this.imagem}}" alt="{{this.nome}}">
+            {{else}}
+              <div class="bg-light d-flex justify-content-center align-items-center" style="height: 200px;">
+                Sem imagem
+              </div>
+            {{/if}}
+            <div class="card-body">
+              <h5 class="card-title">{{this.nome}}</h5>
+              <p class="card-text text-primary fs-5">R$ {{formatarPreco this.preco}}</p>
+            </div>
           </div>
-        {{/if}}
-
-        <!-- Conteúdo -->
-        <div class="card-body">
-          <h5 class="card-title">{{this.nome}}</h5>
-          <p class="card-text text-primary fs-6">{{formatarPreco this.preco}}</p>
         </div>
-      </div>
+      {{/each}}
     </div>
-  {{/each}}
-</div>
   {{else}}
     <p class="alert alert-info">Nenhum produto encontrado.</p>
   {{/if}}
@@ -88,7 +85,7 @@
 
   .produto-card img {
     width: 100%;
-    max-height: 320px; /* Altura máxima menor */
+    max-height: 120px; /* Altura máxima menor */
     object-fit: cover;
     border-bottom: 1px solid #ddd;
   }
