@@ -1,6 +1,8 @@
 const express = require('express');
 const { engine } = require('express-handlebars');
-const { MongoClient } = require('mongodb');
+
+const { MongoClient, ObjectId } = require('mongodb');
+
 const multer = require('multer');
 const path = require('path');
 const app = express();
@@ -100,6 +102,67 @@ app.get('/buscar', async (req, res) => {
     res.render('home', { produtos, busca: q });
   } catch (err) {
     res.status(500).send('Erro na busca');
+  }
+});
+// Rota para excluir produto
+app.post('/produtos/excluir/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+   await produtosCollection.deleteOne({ _id: new ObjectId(id) });
+
+    res.redirect('/'); // Volta pra página inicial
+  } catch (err) {
+    console.error('Erro ao excluir produto:', err);
+    res.status(500).send('Erro ao excluir produto');
+  }
+});
+
+// Rota para carregar formulário de edição
+app.get('/produtos/editar/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const produto = await produtosCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!produto) {
+      return res.status(404).send('Produto não encontrado');
+    }
+
+    res.render('editar', { produto });
+  } catch (err) {
+    console.error('Erro ao carregar produto:', err);
+    res.status(500).send('Erro ao carregar produto');
+  }
+});
+
+// Rota para atualizar produto
+app.post('/produtos/editar/:id', upload.single('imagem'), async (req, res) => {
+  const { id } = req.params;
+  const { nome, preco } = req.body;
+  const precoFormatado = parseInt(preco, 10);
+
+  if (!nome || isNaN(precoFormatado)) {
+    return res.status(400).send('Dados inválidos');
+  }
+
+  try {
+    const updateData = { nome, preco: precoFormatado };
+
+    // Se houver nova imagem, atualiza
+    if (req.file) {
+      updateData.imagem = `/uploads/${req.file.filename}`;
+    }
+
+    await produtosCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+
+    res.redirect('/');
+  } catch (err) {
+    console.error('Erro ao atualizar produto:', err);
+    res.status(500).send('Erro ao atualizar produto');
   }
 });
 
