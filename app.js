@@ -3,14 +3,8 @@ const { engine } = require('express-handlebars');
 const { MongoClient } = require('mongodb');
 const multer = require('multer');
 const path = require('path');
-
 const app = express();
 const hbs = require('express-handlebars');
-
-
-
-
-
 /// Config Handlebars com helper de formatação de preço
 const handlebars = hbs.create({
   helpers: {
